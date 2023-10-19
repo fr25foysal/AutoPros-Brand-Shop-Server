@@ -6,12 +6,12 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const port = process.env.PORT || 5001
 
 // Midlewares
-app.use(cors())
 app.use(express.json())
+app.use(cors())
 
 // Ping the app
 app.get('/',(req,res)=>{
-    res.send('Backend Ping Succesful')
+    res.send('Backend Ping Succesful after deploy')
     console.log('Backend Ping Succesful');
 })
 
@@ -29,10 +29,25 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-
+  
 async function run() {
   try {
+    
     await client.connect();
+// get collection from db
+const brandCollection =client.db('autopros').collection('brands')
+const carsCollection = client.db('autopros').collection('cars')
+
+    app.get('/brands', async(req,res)=>{
+      const brands =await brandCollection.find().toArray()
+      res.send(brands)
+    })
+
+    app.post('/cars', async(req,res)=>{
+      const carData = req.body
+      const result =await carsCollection.insertOne(carData)
+      res.send(result)
+    })
 
 
     // Send a ping to confirm a successful connection
