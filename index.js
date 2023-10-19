@@ -2,12 +2,18 @@ const express = require('express')
 const cors = require('cors')
 const app = express()
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5001
 
 // Midlewares
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+  methods: [
+    'GET','POST',' PUT', 'OPTIONS','DELETE','PATCH'
+  ],
+  origin: '*',
+  credentials: true
+}))
 
 // Ping the app
 app.get('/',(req,res)=>{
@@ -30,13 +36,15 @@ const client = new MongoClient(uri, {
   }
 });
   
+const brandCollection =client.db('autopros').collection('brands')
+const carsCollection = client.db('autopros').collection('cars')
+
+
 async function run() {
   try {
     
-    await client.connect();
+ await client.connect();
 // get collection from db
-const brandCollection =client.db('autopros').collection('brands')
-const carsCollection = client.db('autopros').collection('cars')
 
     app.get('/brands', async(req,res)=>{
       const brands =await brandCollection.find().toArray()
@@ -46,6 +54,13 @@ const carsCollection = client.db('autopros').collection('cars')
     app.post('/cars', async(req,res)=>{
       const carData = req.body
       const result =await carsCollection.insertOne(carData)
+      res.send(result)
+    })
+
+    app.get('/:name',async(req,res)=>{
+      const name = req.params.name
+      const filter = { 'brands' : name}
+      const result = await carsCollection.find({"brand":`${name}`}).toArray()
       res.send(result)
     })
 
