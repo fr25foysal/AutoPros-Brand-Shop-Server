@@ -38,6 +38,7 @@ const client = new MongoClient(uri, {
   
 const brandCollection =client.db('autopros').collection('brands')
 const carsCollection = client.db('autopros').collection('cars')
+const slidersCollection = client.db('autopros').collection('sliders')
 
 
 async function run() {
@@ -56,14 +57,20 @@ async function run() {
       const result =await carsCollection.insertOne(carData)
       res.send(result)
     })
-
+// BrandWise Products
     app.get('/:name',async(req,res)=>{
       const name = req.params.name
-      const filter = { 'brands' : name}
-      const result = await carsCollection.find({"brand":`${name}`}).toArray()
+      const filter = { 'brand' : name}
+      const result = await carsCollection.find(filter).toArray()
       res.send(result)
     })
-
+//Brand sliders
+    app.get('/sliders/:name',async(req,res)=>{
+      const name = req.params.id
+      const filter = {'brand': name}
+      const result = await slidersCollection.find(filter).toArray()
+      res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
