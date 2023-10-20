@@ -64,6 +64,17 @@ async function run() {
       const result = await carsCollection.find(filter).toArray()
       res.send(result)
     })
+
+    // get single data 
+    app.get('/:brand/:name',async(req,res)=>{
+      const brand = req.params.brand
+      const name = req.params.name
+      const brandFilter = { 'brand' : brand }
+      const filteredBrand = await carsCollection.find(brandFilter).toArray()
+      const result = filteredBrand.find(p=> p.name === name)
+      res.send(result)
+
+    })
 //Brand sliders
     app.get('/sliders/:name',async(req,res)=>{
       const name = req.params.name
