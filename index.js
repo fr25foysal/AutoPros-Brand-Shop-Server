@@ -1,9 +1,9 @@
-const express = require('express')
-const cors = require('cors')
-const app = express()
+const express = require('express');
+const app = express();
+const cors = require('cors');
 require('dotenv').config()
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const port = process.env.PORT || 5001
+const port= process.env.PORT || 5001
 
 // Midlewares
 app.use(express.json())
@@ -44,7 +44,7 @@ const slidersCollection = client.db('autopros').collection('sliders')
 async function run() {
   try {
     
- await client.connect();
+//  await client.connect();
 // get collection from db
 
     app.get('/brands', async(req,res)=>{
@@ -60,20 +60,20 @@ async function run() {
 // BrandWise Products
     app.get('/:name',async(req,res)=>{
       const name = req.params.name
-      const filter = { 'brand' : name}
+      const filter = { 'brand' : name }
       const result = await carsCollection.find(filter).toArray()
       res.send(result)
     })
 //Brand sliders
     app.get('/sliders/:name',async(req,res)=>{
-      const name = req.params.id
-      const filter = {'brand': name}
-      const result = await slidersCollection.find(filter).toArray()
+      const name = req.params.name
+      const query = { 'brand' : name }
+      const result = await slidersCollection.find({'brand' : `${name}`}).toArray()
       res.send(result)
     })
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
