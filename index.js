@@ -17,7 +17,7 @@ app.use(cors({
 
 // Ping the app
 app.get('/',(req,res)=>{
-    res.send('Backend Ping Succesful after deploy')
+    res.send('lBackend Ping Succesful after deploy')
     console.log('Backend Ping Succesful');
 })
 
@@ -107,10 +107,26 @@ async function run() {
 
     })
 
+    // get cart products
+    app.get('/cart/products/:email',async(req,res)=>{
+      const email = req.params.email
+      const filter = {'email' : email}
+      const result =await cartCollection.find(filter).toArray()
+      res.send(result)
+  })
+
     // Cart Post 
     app.post('/cart',async(req,res)=>{
       const product = req.body
       const result = await cartCollection.insertOne(product)
+      res.send(result)
+    })
+
+    // delete cart product
+    app.delete('/cart/products/:email/:id',async(req,res)=>{
+      const id = req.params.id
+      const query = {'_id': new ObjectId(id)}
+      const result =await cartCollection.deleteOne(query)
       res.send(result)
     })
 
