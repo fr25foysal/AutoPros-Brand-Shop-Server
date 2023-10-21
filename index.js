@@ -39,6 +39,7 @@ const client = new MongoClient(uri, {
 const brandCollection =client.db('autopros').collection('brands')
 const carsCollection = client.db('autopros').collection('cars')
 const slidersCollection = client.db('autopros').collection('sliders')
+const cartCollection = client.db('autopros').collection('cart')
 
 
 async function run() {
@@ -57,11 +58,41 @@ async function run() {
       const result =await carsCollection.insertOne(carData)
       res.send(result)
     })
+
+    // Update Product
+    app.put('/cars/:name',async(req,res)=>{
+      const name = req.params.name 
+      const data = req.body
+      const filter = {'name' : name}
+      const options = {upsert: true}
+      const updatedDate = {
+        $set:{
+          "brand": data.brand,
+          "image": data.image,
+          "name": data.name,
+          "price": data.price,
+          "type": data.type,
+          "rating": data.rating
+        }
+      }
+      
+      const result = await carsCollection.updateOne(filter,updatedDate,options)
+      res.send(result) 
+    })
 // BrandWise Products
     app.get('/:name',async(req,res)=>{
       const name = req.params.name
       const filter = { 'brand' : name }
       const result = await carsCollection.find(filter).toArray()
+      res.send(result)
+    })
+
+//Brand sliders
+    app.get('/sliders/:name',async(req,res)=>{
+      const name = req.params.name
+      const query = { 'brand' : name }
+      // console.log('test');
+      const result = await slidersCollection.find({'brand' : `${name}`}).toArray()
       res.send(result)
     })
 
@@ -75,13 +106,16 @@ async function run() {
       res.send(result)
 
     })
-//Brand sliders
-    app.get('/sliders/:name',async(req,res)=>{
-      const name = req.params.name
-      const query = { 'brand' : name }
-      const result = await slidersCollection.find({'brand' : `${name}`}).toArray()
+
+    // Cart Post 
+    app.post('/cart',async(req,res)=>{
+      const product = req.body
+      const result = await cartCollection.insertOne(product)
       res.send(result)
     })
+
+    // ----------------------Stop Here---------------------------------//
+
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
